@@ -2,7 +2,7 @@ module.exports = {
   // devtool: 'eval-source-map',
   entry: __dirname + "/source/App.js",
   output: {
-    path: __dirname + "/public",
+    path: __dirname + "/static/js",
     filename: "bundle.js"
   },
 
@@ -17,7 +17,7 @@ module.exports = {
     }]
   },
   devServer: {
-    contentBase: './public',
+    contentBase: './static',
     colors: true,
     historyApiFallback: true,
     inline: true
