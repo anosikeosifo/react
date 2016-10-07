@@ -24,7 +24,6 @@ export default class KanbanBoardContainer extends Component {
     let newTask = { id: Date.now(), name: taskName, done: false };
     let prevState = this.state;
 
-    console.log('cardId: ', cardId);
     let updatedState = update(this.state.cards, {
       [cardIndex]: {
         tasks: { $push: [newTask] }
@@ -61,7 +60,7 @@ export default class KanbanBoardContainer extends Component {
     let cardIndex = this.state.cards.findIndex((card) => cardId == card.id);
     let prevState = this.state;
 
-    //update the list of cards exempt the current card at cartdIndex
+    //update the list of cards to exempt the current card at cartdIndex
     let updateCards = update(this.state.cards, {
       [cardIndex]: {
         tasks: {
@@ -71,7 +70,7 @@ export default class KanbanBoardContainer extends Component {
     });
 
     this.setState({ cards: updateCards });
-    
+
     fetch(`${ this.apiData.url }/cards/${ cardId }/tasks/${ taskId }`, {
       method: 'delete',
       headers: this.apiData.headers
@@ -142,7 +141,6 @@ export default class KanbanBoardContainer extends Component {
   }
 
   render() {
-    console.log('this.state.cards: ', this.state.cards);
     return (
       <KanbanBoard cards={ this.state.cards } taskCallBacks={{ add: this.addTask.bind(this), delete: this.deleteTask.bind(this), toggle: this.toggleTask.bind(this) }} />
     );

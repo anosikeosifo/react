@@ -99,3 +99,25 @@ ul {
   margin-top: 5px;
   border-radius: 3px;
 }
+
+.togglecard-enter {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.togglecard-enter-active {
+  max-height: 300px;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in;
+}
+
+.togglecard-leave {
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.togglecard-leave-active {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in;
+}
