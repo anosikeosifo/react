@@ -1,3 +1,4 @@
-node_modules
+flux_bank_account/node_modules
+kanban/node_modules
 .git
 npm-debug.log
