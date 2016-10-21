@@ -3,8 +3,8 @@ import constants from '../constants';
 import AirCheapAPI from '../api/AirCheapAPI';
 
 class AirportActionCreators {
-  static fetchAiports() {
-    AirCheapAPI.fetchAiports();
+  static fetchAirports() {
+    AirCheapAPI.fetchAirports();
     AppDispatcher.dispatch({
       type: constants.FETCH_AIRPORTS,
     });
@@ -17,7 +17,7 @@ class AirportActionCreators {
     });
   }
 
-  static fetchAirportsError() {
+  static fetchAirportsError(error) {
     AppDispatcher.dispatch({
       type: constants.FETCH_AIRPORTS_ERROR,
       payload: { error },

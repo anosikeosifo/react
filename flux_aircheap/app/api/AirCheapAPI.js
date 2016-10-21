@@ -1,16 +1,16 @@
 import 'whatwg-fetch';
-import AirportActionCreators from '../Actions/AirportActionCreators';
+import AirportActionCreators from '../actions/AirportActionCreators';
 
 
 class AirCheapAPI {
-  static fetchAiports() {
-    fetch('../../static/airports.json')
+  static fetchAirports() {
+    fetch('airports.json')
       .then((response) => response.json)
       .then((responseData) => {
-        AirportActionCreators.fetchAiportsSuccess(responseData);
+        AirportActionCreators.fetchAirportsSuccess(responseData);
       })
       .catch((error) => {
-        AirportActionCreators.fetchAiportsError(error);
+        AirportActionCreators.fetchAirportsError(error);
       });
   }
 }
