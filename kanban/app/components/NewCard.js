@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import CardForm from './CardForm';
+import CardActionCreators from '../actions/CardActionCreators';
+import DraftStore from '../stores/DraftStore';
+import { Container } from 'flux/utils';
 
 class NewCard extends Component {
 
@@ -15,11 +18,12 @@ class NewCard extends Component {
   }
 
   handleChange(field, value) {
-    this.setState({ [field]: value })
+    CardActionCreators.updateDraft(field, value);
   }
 
   handleSubmit(e) {
-    this.props.cardCallbacks.addCard(this.state);
+    CardActionCreators.addCard(this.state.draft);
+
     this.props.history.pushState(null, '/');
     e.preventDefault();
   }
@@ -28,9 +32,13 @@ class NewCard extends Component {
     this.props.history.pushState(null, '/');
   }
 
+  componentDidMount() {
+    setTimeout(() => CardActionCreators.creatDraft(), 10);
+  }
+
   render() {
     return (
-      <CardForm draftCard={ this.state }
+      <CardForm draftCard={ this.state.draft }
                 buttonLabel='Create Card'
                 handleChange={ this.handleChange.bind(this) }
                 handleSubmit={ this.handleSubmit.bind(this) }
@@ -39,8 +47,9 @@ class NewCard extends Component {
   }
 }
 
-NewCard.propTypes = {
-  cardCallbacks: PropTypes.object,
-}
+NewCard.getStores = () => ([DraftStore]);
+NewCard.calculateState = (prevState) => ({
+  draft: DraftStore.getState()
+})
 
-export default NewCard;
+export default Container.create(NewCard);

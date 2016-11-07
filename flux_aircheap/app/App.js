@@ -2,37 +2,75 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Container } from 'flux/utils';
 import AirportActionCreators from './actions/AirportActionCreators';
+import TicketActionCreators from './actions/TicketActionCreators';
 import AirportStore from './stores/AirportStore';
+import TicketStore from './stores/TicketStore';
+import RouteStore from './stores/RouteStore';
 import Autosuggest from 'react-autosuggest';
+import Utils from './utils/CommonUtils';
 
 class App extends Component {
   componentDidMount() {
-    AirportActionCreators.fetchAiports();
+    AirportActionCreators.fetchAirports();
   }
 
-  getSuggestions(input, callback) {
-    console.log(`input: ${ input }, callback: ${ callback }`);
-    const escapedInput = input.trim().toLowerCase();
-    const airportMatchRegex = new Regex('\\b' + escapedInput, 'i');
-    const suggestions = this.state.airports
-            .filter(airport => airportMatchRegex.test(airport.city))
-            .sort((aiport1, airport2) => {
-              airport1.city.toLowerCase().indexOf(escapedInput) - airport2.city.toLowerCase().indexOf(escapedInput);
-            })
-            .slice(0, 7)
-            .map(airport => `$(airport.city) - ${ airport.country } (${ airport.code })`);
-    return suggestions;
+  componentWillUpdate(nextProps, nextState) {
+    const originAndDestinationSelected = nextState.origin && nextState.destination;
+    const selectionChangedSinceLastUpdate = (this.state.origin !== nextState.origin || this.state.destination !== nextState.destination);
+
+    if(originAndDestinationSelected && selectionChangedSinceLastUpdate) {
+      TicketActionCreators.fetchTickets(nextState.origin, nextState.destination);
+    }
   }
 
-  onSuggestionFetchRequested() {
-    
+  renderSuggestion(suggestion) {
+    return (
+      <div className='suggestion__item'>{ suggestion }</div>
+    )
   }
 
-  onSuggestionClearRequested() {
+  getSuggestionValue(suggestion) {
+    return suggestion;
+  }
 
+  onSuggestionsFetchRequested(input) {
+    const suggestions = Utils.filterAndSort(this.state.airports, input.value);
+    this.setState({ suggestionResults: suggestions })
+  }
+
+  onSuggestionsClearRequested() {
+    this.setState({ suggestionResults: [] })
+  }
+
+  handleSourceInputChange(event, { newValue }) {
+    this.setState({ sourceFilterValue: newValue })
+  }
+
+  handleDestinationInputChange(event, { newValue }) {
+    this.setState({ destinationFilterValue: newValue })
+  }
+
+  handleSelect(target, suggestion, event) {
+    const airportCodeRegex = /\(([^)]+)\)/;
+    let airportCode = airportCodeRegex.exec(suggestion)[1];
+    AirportActionCreators.chooseAirport(target, airportCode)
   }
 
   render() {
+    const sourceInputProps = {
+      placeholder: 'From',
+      onChange: this.handleSourceInputChange.bind(this),
+      value: this.state.sourceFilterValue,
+    };
+
+    const destinationInputProps = {
+      placeholder: 'To',
+      onChange: this.handleDestinationInputChange.bind(this),
+      value: this.state.destinationFilterValue,
+    };
+
+    let ticketList = this.state.tickets.map((ticket) => { <TicketItem key={ ticket.id } ticket={ ticket } /> })
+
     return(
       <div>
         <header>
@@ -43,26 +81,42 @@ class App extends Component {
 
           <div className='header-route'>
             <Autosuggest id="origin"
-                    onSuggestionFetchRequested={ this.onSuggestionFetchRequested.bind(this) }
-                    onSuggestionClearRequested={ this.onSuggestionClearRequested.bind(this) }
-                    suggestions={ this.getSuggestions.bind(this) }
-                    inputProps={{ placeholder: 'From' }} />
+                    onSuggestionsFetchRequested={ this.onSuggestionsFetchRequested.bind(this) }
+                    onSuggestionsClearRequested={ this.onSuggestionsClearRequested.bind(this) }
+                    suggestions={ this.state.suggestionResults }
+                    renderSuggestion={ this.renderSuggestion }
+                    getSuggestionValue={ this.getSuggestionValue }
+                    onSuggestionSelected={ this.handleSelect.bind(this, 'origin') }
+                    inputProps={ sourceInputProps } />
 
             <Autosuggest id="destination"
-                    onSuggestionFetchRequested={ this.onSuggestionFetchRequested.bind(this) }
-                    onSuggestionClearRequested={ this.onSuggestionClearRequested.bind(this) }
-                    suggestions={ this.getSuggestions.bind(this) }
-                    inputProps={{ placeholder: 'To' }} />
+                    onSuggestionsFetchRequested={ this.onSuggestionsFetchRequested.bind(this) }
+                    onSuggestionsClearRequested={ this.onSuggestionsClearRequested.bind(this) }
+                    suggestions={ this.state.suggestionResults }
+                    renderSuggestion={ this.renderSuggestion }
+                    getSuggestionValue={ this.getSuggestionValue }
+                    onSuggestionSelected={ this.handleSelect.bind(this, 'destination') }
+                    inputProps={ destinationInputProps } />
           </div>
         </header>
+
+        <section>
+          { ticketList }
+        </section>
       </div>
     )
   }
 }
 
-App.getStores = () => ([AirportStore]);
+App.getStores = () => ([AirportStore, TicketStore, RouteStore]);
 App.calculateState = (previousState) => ({
-  airports: AirportStore.getState()
+  airports: AirportStore.getState(),
+  tickets: TicketStore.getState(),
+  origin: RouteStore.get('origin'),
+  destination: RouteStore.get('destination'),
+  sourceFilterValue: '',
+  destinationFilterValue: '',
+  suggestionResults: [],
 });
 
 const AppContainer = Container.create(App);

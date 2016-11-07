@@ -3,8 +3,9 @@ import CheckList from './CheckList';
 import marked from 'marked';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { DragSource, DropTarget } from 'react-dnd';
-import Constants from '../lib/constants';
+import Constants from '../constants';
 import { Link } from 'react-router';
+import CardActionCreators from '../actions/CardActionCreators';
 
 let titlePropType = (props, propName, componentName) => {
   if (props[propName]) {
@@ -24,14 +25,14 @@ const cardDragSpec = {
   },
 
   endDrag(props, monitor) {
-    props.cardCallbacks.persistDrag(props.id, props.status);
+    CardActionCreators.persistDrag(props.id, props.status);
   }
 };
 
 const cardDropSpec = {
   hover(props, monitor) {
     const draggedCardId = monitor.getItem().id;
-    props.cardCallbacks.updatePosition(draggedCardId, props.id);
+    CardActionCreators.updatePosition(draggedCardId, props.id);
   }
 }
 
@@ -48,33 +49,25 @@ let collectDrop = (connect, monitor) => {
 }
 
 class Card extends Component {
-  constructor() {
-    super();
-    this.state = {
-      showDetails: false
-    };
-
-    this.sideColors = { "in-progress": "#ffa600", "done": "green", "todo": "blue" };
-  }
-
   setCardStyle(status){
     return { borderLeft: `4px solid ${ this.sideColors[status] }` };
   }
 
   toggleCardDetails() {
-    this.setState({ showDetails: !this.state.showDetails });
+    CardActionCreators.toggleCardDetails(this.props.id)
   }
 
   render() {
     let cardDetails;
-    let { connectDragSource, connectDropTarget } = this.props;
+    let { connectDragSource, connectDropTarget, isDragging } = this.props;
+    let sideColors = { "in-progress": "#ffa600", "done": "green", "todo": "blue" };
 
-    if (this.state.showDetails) {
+    if (this.props.showDetails !== false) {
       cardDetails = (
         <div className="card__details">
           <div className="class__title">{ this.props.title }</div>
           <div className="class__description" dangerouslySetInnerHTML={{ __html:marked(this.props.description) }}/>
-          <CheckList cardId={ this.props.id } tasks={ this.props.tasks } taskCallbacks={ this.props.taskCallbacks }/>
+          <CheckList cardId={ this.props.id } tasks={ this.props.tasks } />
         </div>
       );
     }
@@ -83,7 +76,7 @@ class Card extends Component {
     return connectDropTarget(connectDragSource(
       <section className="card" style={ this.setCardStyle(this.props.status) }>
         <div className='card__edit'><Link to={ '/edit/' + this.props.id }>&#9998;</Link></div>
-        <div className={ `card__title ${ this.state.showDetails ? 'card__open' : '' }` } onClick={ () => this.toggleCardDetails() }>{ this.props.title }</div>
+        <div className={ `card__title ${ this.props.showDetails !== false ? 'card__title card__title--is-open' : 'card__title' }` } onClick={ this.toggleCardDetails.bind(this) }>{ this.props.title }</div>
         <ReactCSSTransitionGroup transitionName="togglecard" transitionEnterTimeout={100} transitionLeaveTimeout={100}>
           { cardDetails }
         </ReactCSSTransitionGroup>
@@ -98,12 +91,9 @@ Card.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   task: PropTypes.arrayOf(PropTypes.object),
-  taskCallbacks: PropTypes.object,
-  cardCallbacks: PropTypes.object,
   connectDragSource: PropTypes.func.isRequired,
   connectDropTarget: PropTypes.func.isRequired,
 }
-
 
 const dragHighOrderCard = DragSource(Constants.CARD, cardDragSpec, collectDrag)(Card);
 const dropHighOrderCard = DropTarget(Constants.CARD, cardDropSpec, collectDrop)(dragHighOrderCard);

@@ -4,14 +4,14 @@ import AirportActionCreators from '../actions/AirportActionCreators';
 
 class AirCheapAPI {
   static fetchAirports() {
-    fetch('airports.json')
-      .then((response) => response.json)
-      .then((responseData) => {
-        AirportActionCreators.fetchAirportsSuccess(responseData);
-      })
-      .catch((error) => {
-        AirportActionCreators.fetchAirportsError(error);
-      });
+    return fetch('airports.json')
+    .then((response) => response.json())
+
+  }
+
+  static fetchTickets() {
+    return fetch('tickets.json')
+    .then((response) => response.json())
   }
 }
 

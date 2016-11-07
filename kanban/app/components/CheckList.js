@@ -1,23 +1,22 @@
 import React, { Component, PropTypes } from 'react';
+import TaskActionCreators from '../actions/TaskActionCreators';
 
 export default class CheckList extends Component {
-
   handleNewTaskInput(event) {
     if(event.key == 'Enter') {
-      this.props.taskCallbacks.add(this.props.cardId, event.target.value);
+      let newTask = { id: Date.now(), name: event.target.value, done: false }
+      TaskActionCreators.addTask(this.props.cardId, newTask);
       event.target.value = '';
     }
-
-    //clear the input box's value
   }
 
   render() {
     let taskItems = this.props.tasks.map((task, taskIndex) => {
       return (
         <li className="checklist__task" key={ task.id }>
-          <input type="checkbox" defaultChecked={ task.done } onChange={ this.props.taskCallbacks.toggle.bind(null, this.props.cardId, task.id, taskIndex)}/>
+          <input type="checkbox" defaultChecked={ task.done } onChange={ TaskActionCreators.toggleTask.bind(null, this.props.cardId, task, taskIndex)}/>
           <span>{ task.name }</span>
-          <a href="#" className="checklist__task--remove" onClick={ this.props.taskCallbacks.delete.bind(null, this.props.cardId, task.id, taskIndex)}/>
+          <a href="#" className="checklist__task--remove" onClick={ TaskActionCreators.deleteTasks.bind(null, this.props.cardId, task, taskIndex)}/>
         </li>
       );
     });
@@ -32,7 +31,6 @@ export default class CheckList extends Component {
 }
 
 CheckList.propTypes = {
-  taskCallbacks: PropTypes.object,
   cardId: PropTypes.number.isRequired,
   tasks: PropTypes.arrayOf(PropTypes.object),
 }
