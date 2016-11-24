@@ -2,5 +2,6 @@ flux_bank_account/node_modules
 kanban/node_modules
 flux_aircheap/node_modules
 redux_bank/node_modules
+redux_aircheap/node_modules
 .git
 npm-debug.log

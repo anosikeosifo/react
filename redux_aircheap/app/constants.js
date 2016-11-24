@@ -1,12 +1,12 @@
 export default {
-  FETCH_AIRPORTS: 'fetch airports',
-  FETCH_AIRPORTS_SUCCESS:'fetch airports success',
-  FETCH_AIRPORTS_ERROR: 'fetch airports error',
-  CHOOSE_AIRPORT: 'chhose airport',
+  REQUEST_AIRPORTS: 'Request airports',
+  RECEIVE_AIRPORTS:'Receive airports',
+  REQUEST_AIRPORTS_ERROR: 'Request airports error',
+  CHOOSE_AIRPORT: 'choose airport',
 
-  FETCH_TICKETS: 'fetch tickets',
-  FETCH_TICKETS_SUCCESS:'fetch tickets success',
-  FETCH_TICKETS_ERROR: 'fetch tickets error',
+  REQUEST_TICKETS: 'request tickets',
+  RECEIVE_TICKETS:'receive tickets',
+  REQUEST_TICKETS_ERROR: 'request tickets error',
 
 
   SOURCE_FILTER_INPUT_CHANGE: 'From filter for airports changed',
