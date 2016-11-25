@@ -3,5 +3,6 @@ kanban/node_modules
 flux_aircheap/node_modules
 redux_bank/node_modules
 redux_aircheap/node_modules
+perf_clock/node_modules
 .git
 npm-debug.log
