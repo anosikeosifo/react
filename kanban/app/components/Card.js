@@ -6,6 +6,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import Constants from '../constants';
 import { Link } from 'react-router';
 import CardActionCreators from '../actions/CardActionCreators';
+import shallowCompare from 'react-addons-shallow-compare';
 
 let titlePropType = (props, propName, componentName) => {
   if (props[propName]) {
@@ -49,6 +50,10 @@ let collectDrop = (connect, monitor) => {
 }
 
 class Card extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+
   setCardStyle(status){
     return { borderLeft: `4px solid ${ this.sideColors[status] }` };
   }
