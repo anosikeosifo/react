@@ -13,7 +13,6 @@ export default class AirportActionCreators {
   }
 
   static chooseAirport(target, airport) {
-    console.log('inside chooseAirport:  airportValue: ', airport )
     return {
       type: constants.CHOOSE_AIRPORT,
       target: target,
